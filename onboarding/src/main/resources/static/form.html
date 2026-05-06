@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Student Onboarding</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to right, #74ebd5, #9face6);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .field {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-size: 14px;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input {
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            transition: 0.3s;
+        }
+
+        input:focus {
+            border-color: #4CAF50;
+            outline: none;
+            box-shadow: 0 0 5px rgba(76,175,80,0.5);
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            background: #4CAF50;
+            color: white;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background: #45a049;
+        }
+
+        .file-box {
+            border: 2px dashed #ccc;
+            padding: 15px;
+            text-align: center;
+            border-radius: 8px;
+            background: #fafafa;
+            margin-bottom: 10px;
+        }
+
+        .success {
+            text-align: center;
+            color: green;
+            margin-top: 15px;
+            display: none;
+            font-weight: bold;
+        }
+
+        /* 🔄 LOADER */
+        #loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255,255,255,0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 9999;
+        }
+
+        .spinner {
+            border: 6px solid #f3f3f3;
+            border-top: 6px solid #4CAF50;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        #loader p {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+    <h2>Student Onboarding</h2>
+
+    <form id="onboardForm">
+
+        <div class="row">
+            <div class="field">
+                <label>Email</label>
+                <input type="email" id="email" required>
+            </div>
+            <div class="field">
+                <label>Phone</label>
+                <input type="text" id="phone" required>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="field">
+                <label>First Name</label>
+                <input type="text" id="firstName" required>
+            </div>
+            <div class="field">
+                <label>Last Name</label>
+                <input type="text" id="lastName" required>
+            </div>
+        </div>
+
+        <div class="field">
+            <label>College</label>
+            <input type="text" id="college">
+        </div>
+
+        <div class="field">
+            <label>Address</label>
+            <input type="text" id="address">
+        </div>
+
+        <div class="row">
+            <div class="field">
+                <label>City</label>
+                <input type="text" id="city">
+            </div>
+            <div class="field">
+                <label>Postal Code</label>
+                <input type="text" id="postalCode">
+            </div>
+            <div class="field">
+                <label>State</label>
+                <input type="text" id="state">
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="field">
+                <label>Date of Birth</label>
+                <input type="date" id="dob">
+            </div>
+            <div class="field">
+                <label>Education</label>
+                <input type="text" id="education">
+            </div>
+        </div>
+
+        <div class="field">
+            <label>Mentor Name</label>
+            <input type="text" id="mentorName">
+        </div>
+
+        <div class="file-box">
+            <label>Aadhaar / Address Proof</label>
+            <input type="file" id="aadhaarFile" required>
+        </div>
+
+        <div class="file-box">
+            <label>Bonafide Certificate</label>
+            <input type="file" id="bonafideFile" required>
+        </div>
+
+        <div class="file-box">
+            <label>Marksheet</label>
+            <input type="file" id="marksheetFile" required>
+        </div>
+
+        <br>
+        <button type="submit">Submit</button>
+
+        <div class="success" id="successMsg">
+            ✅ Onboarding Successful!
+        </div>
+
+    </form>
+</div>
+
+<!-- 🔄 Loader -->
+<div id="loader">
+    <div class="spinner"></div>
+    <p>Processing your onboarding...</p>
+</div>
+
+<script>
+    document.getElementById("onboardForm").addEventListener("submit", function(e) {
+        e.preventDefault();
+
+        // 🔄 Show loader
+        document.getElementById("loader").style.display = "flex";
+
+        const formData = new FormData();
+
+        formData.append("name", document.getElementById("firstName").value + " " + document.getElementById("lastName").value);
+        formData.append("email", document.getElementById("email").value);
+        formData.append("phone", document.getElementById("phone").value);
+        formData.append("college", document.getElementById("college").value);
+        formData.append("address", document.getElementById("address").value);
+        formData.append("city", document.getElementById("city").value);
+        formData.append("postalCode", document.getElementById("postalCode").value);
+        formData.append("state", document.getElementById("state").value);
+        formData.append("dob", document.getElementById("dob").value);
+        formData.append("education", document.getElementById("education").value);
+        formData.append("mentorName", document.getElementById("mentorName").value);
+
+        formData.append("aadhaarFile", document.getElementById("aadhaarFile").files[0]);
+        formData.append("bonafideFile", document.getElementById("bonafideFile").files[0]);
+        formData.append("marksheetFile", document.getElementById("marksheetFile").files[0]);
+
+        fetch("/api/onboard", {
+            method: "POST",
+            body: formData
+        })
+        .then(res => res.json())
+        .then(() => {
+            // ✅ Hide loader
+            document.getElementById("loader").style.display = "none";
+
+            document.getElementById("successMsg").style.display = "block";
+            document.getElementById("onboardForm").reset();
+        })
+        .catch(() => {
+            document.getElementById("loader").style.display = "none";
+            alert("Error occurred");
+        });
+    });
+</script>
+
+</body>
+</html>
