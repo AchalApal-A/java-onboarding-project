@@ -23,7 +23,7 @@ public class EmailService {
 
             helper.setTo(toEmail);
             helper.setSubject("Welcome to Company 🚀");
-            helper.setFrom("no-reply@company.com");
+            helper.setFrom("byeh8096@gmail.com");
 
             // ✅ Updated HTML Template (link + button)
             String htmlContent = """
