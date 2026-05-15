@@ -1,72 +1,51 @@
 package com.example.onboarding.service;
 
-import jakarta.mail.internet.MimeMessage;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
-import org.springframework.scheduling.annotation.Async;
+import com.sendgrid.*;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.UUID;
+import java.io.IOException;
 
 @Service
 public class EmailService {
 
-    @Autowired
-    private JavaMailSender mailSender;
+    @Value("${SENDGRID_API_KEY}")
+    private String apiKey;
 
-    @Async
     public void sendMail(String toEmail, String userName, String utmLink) {
 
+        Email from = new Email("your_verified_email@gmail.com");
+        Email to = new Email(toEmail);
+        String subject = "Welcome to Company 🚀";
+
+        String htmlContent = """
+                <h2>Welcome, %s 👋</h2>
+                <p>Your onboarding is successful.</p>
+
+                <p><b>Your UTM Link:</b></p>
+                <p>%s</p>
+
+                <a href="%s">Get Started 🚀</a>
+                """.formatted(userName, utmLink, utmLink);
+
+        Content content = new Content("text/html", htmlContent);
+        Mail mail = new Mail(from, subject, to, content);
+
+        SendGrid sg = new SendGrid(apiKey);
+        Request request = new Request();
+
         try {
-            System.out.println(">>> EMAIL METHOD ENTERED");
+            request.setMethod(Method.POST);
+            request.setEndpoint("mail/send");
+            request.setBody(mail.build());
 
-            MimeMessage message = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, true);
+            Response response = sg.api(request);
 
-            helper.setTo(toEmail);
-            helper.setSubject("Welcome to Company 🚀");
-            helper.setFrom("byeh8096@gmail.com");
+            System.out.println("SendGrid Status: " + response.getStatusCode());
 
-            String htmlContent = """
-                    <h2>Welcome, %s 👋</h2>
-                    <p>Your onboarding is <b>successful</b>.</p>
-
-                    <p><b>Your UTM Link:</b></p>
-                    <p style="word-break: break-all; color: blue;">
-                        %s
-                    </p>
-
-                    <br>
-
-                    <p>Click below to get started:</p>
-
-                    <a href="%s"
-                       style="display:inline-block; padding:10px 15px; background-color:#4CAF50; color:white; text-decoration:none; border-radius:5px;">
-                        Get Started 🚀
-                    </a>
-                    """.formatted(userName, utmLink, utmLink);
-
-            helper.setText(htmlContent, true);
-
-            System.out.println(">>> BEFORE SMTP SEND");
-
-            mailSender.send(message);
-
-            System.out.println(">>> EMAIL SENT SUCCESSFULLY");
-
-        } catch (Exception e) {
-            System.out.println(">>> EMAIL FAILED");
+        } catch (IOException e) {
             e.printStackTrace();
+            throw new RuntimeException("SendGrid email failed");
         }
-    }
-
-    public String generateUTM(String name) {
-        String safeName = name.replaceAll(" ", "_");
-
-        return "https://gpi.industryacademiacommunity.com/iac"
-                + "?utm_source=email"
-                + "&utm_medium=onboarding"
-                + "&utm_campaign=" + safeName + "_" + UUID.randomUUID();
     }
 }
