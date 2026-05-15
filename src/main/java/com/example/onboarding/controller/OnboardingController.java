@@ -17,7 +17,6 @@ public class OnboardingController {
 
     @PostMapping(value = "/onboard", consumes = "multipart/form-data")
     public ResponseEntity<ApiResponse> onboardUser(
-
             @RequestParam String name,
             @RequestParam String email,
             @RequestParam String phone,
@@ -29,11 +28,12 @@ public class OnboardingController {
             @RequestParam String dob,
             @RequestParam String education,
             @RequestParam(required = false) String mentorName,
-
             @RequestParam("aadhaarFile") MultipartFile aadhaarFile,
             @RequestParam("bonafideFile") MultipartFile bonafideFile,
             @RequestParam("marksheetFile") MultipartFile marksheetFile
     ) {
+
+        System.out.println(">>> CONTROLLER HIT /onboard");
 
         User savedUser = onboardingService.onboardUser(
                 name, email, phone, college, address, city,
