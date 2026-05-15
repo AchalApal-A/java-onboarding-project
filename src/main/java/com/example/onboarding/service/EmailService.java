@@ -14,7 +14,7 @@ public class EmailService {
 
     public void sendMail(String toEmail, String userName, String utmLink) {
 
-        Email from = new Email("your_verified_email@gmail.com");
+        Email from = new Email("byeh8096@gmail.com");
         Email to = new Email(toEmail);
         String subject = "Welcome to Company 🚀";
 
