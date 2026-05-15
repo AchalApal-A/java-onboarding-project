@@ -1,66 +1,63 @@
-package com.example.onboarding.service;
+public User onboardUser(
+        String name, String email, String phone, String college,
+        String address, String city, String postalCode, String state,
+        String dob, String education, String mentorName,
+        MultipartFile aadhaarFile,
+        MultipartFile bonafideFile,
+        MultipartFile marksheetFile
+) {
 
-import com.example.onboarding.entity.User;
-import com.example.onboarding.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
+    System.out.println(">>> ONBOARDING STARTED");
 
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.UUID;
+    User user = new User();
 
-@Service
-public class OnboardingService {
+    user.setName(name);
+    user.setEmail(email);
+    user.setPhone(phone);
+    user.setCollege(college);
+    user.setAddress(address);
+    user.setCity(city);
+    user.setPostalCode(postalCode);
+    user.setState(state);
+    user.setDob(dob);
+    user.setEducation(education);
+    user.setMentorName(mentorName);
 
-    @Autowired
-    private UserRepository userRepository;
+    try {
+        System.out.println(">>> FILE UPLOAD STARTED");
 
-    @Autowired
-    private EmailService emailService;
+        String uploadDir = "uploads/";
+        Files.createDirectories(Paths.get(uploadDir));
 
-    public User onboardUser(
-            String name, String email, String phone, String college,
-            String address, String city, String postalCode, String state,
-            String dob, String education, String mentorName,
-            MultipartFile aadhaarFile,
-            MultipartFile bonafideFile,
-            MultipartFile marksheetFile
-    ) {
+        Files.write(Paths.get(uploadDir + aadhaarFile.getOriginalFilename()), aadhaarFile.getBytes());
+        Files.write(Paths.get(uploadDir + bonafideFile.getOriginalFilename()), bonafideFile.getBytes());
+        Files.write(Paths.get(uploadDir + marksheetFile.getOriginalFilename()), marksheetFile.getBytes());
 
-        User user = new User();
+        System.out.println(">>> FILE UPLOAD DONE");
 
-        user.setName(name);
-        user.setEmail(email);
-        user.setPhone(phone);
-        user.setCollege(college);
-        user.setAddress(address);
-        user.setCity(city);
-        user.setPostalCode(postalCode);
-        user.setState(state);
-        user.setDob(dob);
-        user.setEducation(education);
-        user.setMentorName(mentorName);
+    } catch (Exception e) {
+        e.printStackTrace();
+        throw new RuntimeException("File upload failed");
+    }
 
-        try {
-            String uploadDir = "uploads/";
-            Files.createDirectories(Paths.get(uploadDir));
+    String utm = emailService.generateUTM(name);
+    user.setUtmLink(utm);
 
-            Files.write(Paths.get(uploadDir + aadhaarFile.getOriginalFilename()), aadhaarFile.getBytes());
-            Files.write(Paths.get(uploadDir + bonafideFile.getOriginalFilename()), bonafideFile.getBytes());
-            Files.write(Paths.get(uploadDir + marksheetFile.getOriginalFilename()), marksheetFile.getBytes());
+    User savedUser = userRepository.save(user);
 
-        } catch (Exception e) {
-            throw new RuntimeException("File upload failed");
-        }
+    System.out.println(">>> USER SAVED IN DB");
 
-        String utm = emailService.generateUTM(name);
-        user.setUtmLink(utm);
-
-        User savedUser = userRepository.save(user);
+    try {
+        System.out.println(">>> BEFORE EMAIL CALL");
 
         emailService.sendMail(email, name, utm);
 
-        return savedUser;
+        System.out.println(">>> AFTER EMAIL CALL");
+
+    } catch (Exception e) {
+        System.out.println(">>> EMAIL FAILED");
+        e.printStackTrace();
     }
+
+    return savedUser;
 }
