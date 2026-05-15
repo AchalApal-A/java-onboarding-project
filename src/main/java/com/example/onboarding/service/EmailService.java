@@ -49,9 +49,10 @@ public class EmailService {
 
             mailSender.send(message);
 
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to send email: " + e.getMessage());
-        }
+        }catch (Exception e) {
+    e.printStackTrace();
+    throw new RuntimeException("Failed to send email", e);
+}
     }
 
     // ✅ Generate UTM
