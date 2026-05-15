@@ -1,45 +1,72 @@
-public void sendMail(String toEmail, String userName, String utmLink) {
+package com.example.onboarding.service;
 
-    try {
-        System.out.println(">>> EMAIL METHOD ENTERED");
+import jakarta.mail.internet.MimeMessage;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Service;
 
-        MimeMessage message = mailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(message, true);
+import java.util.UUID;
 
-        helper.setTo(toEmail);
-        helper.setSubject("Welcome to Company 🚀");
-        helper.setFrom("byeh8096@gmail.com");
+@Service
+public class EmailService {
 
-        String htmlContent = """
-                <h2>Welcome, %s 👋</h2>
-                <p>Your onboarding is <b>successful</b>.</p>
+    @Autowired
+    private JavaMailSender mailSender;
 
-                <p><b>Your UTM Link:</b></p>
-                <p style="word-break: break-all; color: blue;">
-                    %s
-                </p>
+    @Async
+    public void sendMail(String toEmail, String userName, String utmLink) {
 
-                <br>
+        try {
+            System.out.println(">>> EMAIL METHOD ENTERED");
 
-                <p>Click below to get started:</p>
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true);
 
-                <a href="%s"
-                   style="display:inline-block; padding:10px 15px; background-color:#4CAF50; color:white; text-decoration:none; border-radius:5px;">
-                    Get Started 🚀
-                </a>
-                """.formatted(userName, utmLink, utmLink);
+            helper.setTo(toEmail);
+            helper.setSubject("Welcome to Company 🚀");
+            helper.setFrom("byeh8096@gmail.com");
 
-        helper.setText(htmlContent, true);
+            String htmlContent = """
+                    <h2>Welcome, %s 👋</h2>
+                    <p>Your onboarding is <b>successful</b>.</p>
 
-        System.out.println(">>> BEFORE SMTP SEND");
+                    <p><b>Your UTM Link:</b></p>
+                    <p style="word-break: break-all; color: blue;">
+                        %s
+                    </p>
 
-        mailSender.send(message);
+                    <br>
 
-        System.out.println(">>> EMAIL SENT SUCCESSFULLY");
+                    <p>Click below to get started:</p>
 
-    } catch (Exception e) {
-        System.out.println(">>> SMTP ERROR OCCURRED");
-        e.printStackTrace();
-        throw new RuntimeException("Failed to send email", e);
+                    <a href="%s"
+                       style="display:inline-block; padding:10px 15px; background-color:#4CAF50; color:white; text-decoration:none; border-radius:5px;">
+                        Get Started 🚀
+                    </a>
+                    """.formatted(userName, utmLink, utmLink);
+
+            helper.setText(htmlContent, true);
+
+            System.out.println(">>> BEFORE SMTP SEND");
+
+            mailSender.send(message);
+
+            System.out.println(">>> EMAIL SENT SUCCESSFULLY");
+
+        } catch (Exception e) {
+            System.out.println(">>> EMAIL FAILED");
+            e.printStackTrace();
+        }
+    }
+
+    public String generateUTM(String name) {
+        String safeName = name.replaceAll(" ", "_");
+
+        return "https://gpi.industryacademiacommunity.com/iac"
+                + "?utm_source=email"
+                + "&utm_medium=onboarding"
+                + "&utm_campaign=" + safeName + "_" + UUID.randomUUID();
     }
 }
