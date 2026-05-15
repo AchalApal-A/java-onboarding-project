@@ -252,7 +252,7 @@
         formData.append("bonafideFile", document.getElementById("bonafideFile").files[0]);
         formData.append("marksheetFile", document.getElementById("marksheetFile").files[0]);
 
-        fetch("/api/onboard", {
+        fetch("https://https://java-onboarding-project-1.onrender.com/api/onboard", {", {
             method: "POST",
             body: formData
         })
