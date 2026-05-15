@@ -15,6 +15,11 @@ public class OnboardingController {
     @Autowired
     private OnboardingService onboardingService;
 
+    @GetMapping("/")
+    public String home() {
+        return "Onboarding Project Running Successfully!";
+    }
+
     @PostMapping(value = "/onboard", consumes = "multipart/form-data")
     public ResponseEntity<ApiResponse> onboardUser(
 
